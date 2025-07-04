@@ -1,5 +1,5 @@
-import React, { useState, useCallback, useEffect } from 'react';
-import { View, StyleSheet, Platform } from 'react-native';
+import React, { useState, useCallback } from 'react';
+import { View, StyleSheet } from 'react-native';
 import MessageList from './MessageList';
 import MessageInput from './MessageInput';
 
