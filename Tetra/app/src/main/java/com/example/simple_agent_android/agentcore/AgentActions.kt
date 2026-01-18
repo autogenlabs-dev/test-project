@@ -1,0 +1,78 @@
+package com.example.simple_agent_android.agentcore
+
+import com.example.simple_agent_android.accessibility.service.BoundingBoxAccessibilityService
+import org.json.JSONArray
+
+object AgentActions {
+    fun getScreenJson(): String {
+        return BoundingBoxAccessibilityService.getInteractiveElementsJson()
+    }
+
+    fun simulatePressAt(x: Int, y: Int) {
+        BoundingBoxAccessibilityService.simulatePressAt(x, y)
+    }
+
+    fun setTextAt(x: Int, y: Int, text: String) {
+        BoundingBoxAccessibilityService.setTextAt(x, y, text)
+    }
+
+    fun focusAndSetText(x: Int, y: Int, text: String): Boolean {
+        return try {
+            // First press to focus
+            BoundingBoxAccessibilityService.simulatePressAt(x, y)
+            Thread.sleep(500) // Wait for focus
+
+            // Then set text
+            BoundingBoxAccessibilityService.setTextAt(x, y, text)
+            Thread.sleep(300) // Wait for text to be set
+
+            true
+        } catch (e: Exception) {
+            false
+        }
+    }
+
+    fun goHome() {
+        BoundingBoxAccessibilityService.goHome()
+    }
+
+    fun goBack() {
+        BoundingBoxAccessibilityService.goBack()
+    }
+
+    fun swipe(startX: Int, startY: Int, endX: Int, endY: Int, duration: Long = 300) {
+        BoundingBoxAccessibilityService.swipe(startX, startY, endX, endY, duration)
+    }
+
+    fun waitFor(durationMs: Long) {
+        Thread.sleep(durationMs)
+    }
+
+    fun waitForElement(
+        text: String? = null,
+        contentDescription: String? = null,
+        className: String? = null,
+        timeoutMs: Long = 5000L,
+        pollIntervalMs: Long = 300L
+    ): Boolean {
+        val start = System.currentTimeMillis()
+        while (System.currentTimeMillis() - start < timeoutMs) {
+            val json = BoundingBoxAccessibilityService.getInteractiveElementsJson()
+            try {
+                val arr = JSONArray(json)
+                for (i in 0 until arr.length()) {
+                    val obj = arr.getJSONObject(i)
+                    if ((text == null || obj.optString("text") == text) &&
+                        (contentDescription == null || obj.optString("contentDescription") == contentDescription) &&
+                        (className == null || obj.optString("className") == className)) {
+                        return true
+                    }
+                }
+            } catch (e: Exception) {
+                // Continue trying
+            }
+            Thread.sleep(pollIntervalMs)
+        }
+        return false
+    }
+}

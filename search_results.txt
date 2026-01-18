@@ -1,0 +1,23 @@
+Tetra/app/src/main/java/com/example/simple_agent_android/ui/OnboardingScreen.kt:                label = { Text("OpenAI API Key") },
+Tetra/app/src/main/java/com/example/simple_agent_android/ui/SettingsScreen.kt:                    text = "Enter your OpenAI API key to enable agent functionality",
+Tetra/app/src/main/java/com/example/simple_agent_android/ui/SettingsScreen.kt:                            "OpenAI API Key",
+Tetra/app/src/main/java/com/example/simple_agent_android/ui/SettingsScreen.kt:                    text = "Your API key is stored locally on your device and is never transmitted to our servers. It's only used to communicate directly with OpenAI's services.",
+Tetra/app/src/main/java/com/example/simple_agent_android/utils/SharedPrefsUtils.kt:    fun getOpenAIKey(context: Context): String {
+Tetra/app/src/main/java/com/example/simple_agent_android/utils/SharedPrefsUtils.kt:    fun setOpenAIKey(context: Context, key: String) {
+Tetra/app/src/main/java/com/example/simple_agent_android/notification/VoiceInputActivity.kt:            val apiKey = SharedPrefsUtils.getOpenAIKey(this)
+Tetra/app/src/main/java/com/example/simple_agent_android/notification/VoiceInputActivity.kt:                NotificationHelper.showToast(this, "Please configure OpenAI API key in settings")
+Tetra/app/src/main/java/com/example/simple_agent_android/notification/NotificationActionReceiver.kt:                val apiKey = SharedPrefsUtils.getOpenAIKey(context)
+Tetra/app/src/main/java/com/example/simple_agent_android/notification/NotificationActionReceiver.kt:                    NotificationHelper.showToast(context, "Please configure OpenAI API key in settings")
+Tetra/app/src/main/java/com/example/simple_agent_android/agentcore/LLMClient.kt:    // Tool definitions for OpenAI function calling
+Tetra/app/src/main/java/com/example/simple_agent_android/agentcore/LLMClient.kt:                        else -> ApiErrorTracker.trackOpenAIError(
+Tetra/app/src/main/java/com/example/simple_agent_android/agentcore/LLMClient.kt:                    ApiErrorTracker.trackOpenAIError(
+Tetra/app/src/main/java/com/example/simple_agent_android/data/OnboardingData.kt:            title = "Set OpenAI API Key",
+Tetra/app/src/main/java/com/example/simple_agent_android/data/OnboardingData.kt:            description = "Enter your OpenAI API key to enable the AI functionality. You can get one from platform.openai.com.",
+Tetra/app/src/main/java/com/example/simple_agent_android/sentry/ApiErrorTracker.kt:     * Track OpenAI API errors with detailed context
+Tetra/app/src/main/java/com/example/simple_agent_android/sentry/ApiErrorTracker.kt:    fun trackOpenAIError(
+Tetra/app/src/main/java/com/example/simple_agent_android/sentry/ApiErrorTracker.kt:            message = "OpenAI API Error: ${error.message}",
+Tetra/app/src/main/java/com/example/simple_agent_android/sentry/ApiErrorTracker.kt:            message = "OpenAI API call failed",
+Tetra/app/src/main/java/com/example/simple_agent_android/sentry/ApiErrorTracker.kt:            message = "OpenAI API message sequencing error: $errorMessage",
+Tetra/app/src/main/java/com/example/simple_agent_android/sentry/SentryExtensions.kt:        ApiErrorTracker.trackOpenAIError(
+Tetra/app/src/main/java/com/example/simple_agent_android/viewmodel/MainViewModel.kt:        _openAiKey.value = SharedPrefsUtils.getOpenAIKey(context)
+Tetra/app/src/main/java/com/example/simple_agent_android/viewmodel/MainViewModel.kt:        SharedPrefsUtils.setOpenAIKey(context, _openAiKey.value)
