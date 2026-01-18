@@ -1,0 +1,18 @@
+<?xml version="1.0" encoding="utf-8"?>
+<com.google.android.material.floatingactionbutton.FloatingActionButton
+    xmlns:android="http://schemas.android.com/apk/res/android"
+    xmlns:app="http://schemas.android.com/apk/res-auto"
+    android:id="@+id/fab_start_agent"
+    android:layout_width="wrap_content"
+    android:layout_height="wrap_content"
+    android:src="@android:drawable/ic_input_add"
+    android:contentDescription="Start Agent"
+    app:tint="@color/reagent_black"
+    app:backgroundTint="@color/reagent_blue_bright"
+    app:fabSize="normal"
+    android:theme="@style/Theme.MaterialComponents.Light"
+    style="@style/Widget.MaterialComponents.FloatingActionButton"
+    app:elevation="8dp"
+    app:pressedTranslationZ="16dp"
+    app:borderWidth="0dp"
+    app:rippleColor="@color/reagent_white" />

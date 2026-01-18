@@ -1,0 +1,94 @@
+package com.example.simple_agent_android.accessibility.service
+
+import android.accessibilityservice.AccessibilityService
+import android.graphics.Rect
+import android.view.accessibility.AccessibilityNodeInfo
+import org.json.JSONArray
+import org.json.JSONObject
+import com.example.simple_agent_android.utils.SharedPrefsUtils
+
+object InteractiveElementUtils {
+    fun getInteractiveElementsJson(service: BoundingBoxAccessibilityService?): String {
+        val root = service?.rootInActiveWindow ?: return "{}"
+        val elements = mutableListOf<JSONObject>()
+        val context = service.applicationContext
+        val verticalOffset = SharedPrefsUtils.getVerticalOffset(context)
+
+        fun getFirstNonEmptyTextOrDesc(node: AccessibilityNodeInfo?): Pair<String, String> {
+            if (node == null) return "" to ""
+            val text = node.text?.toString() ?: ""
+            val desc = node.contentDescription?.toString() ?: ""
+            if (text.isNotEmpty() || desc.isNotEmpty()) return text to desc
+            for (i in 0 until node.childCount) {
+                val result = getFirstNonEmptyTextOrDesc(node.getChild(i))
+                if (result.first.isNotEmpty() || result.second.isNotEmpty()) return result
+            }
+            return "" to ""
+        }
+
+        fun getAllDescendantTexts(node: AccessibilityNodeInfo?): List<String> {
+            val result = mutableListOf<String>()
+            if (node == null) return result
+            val text = node.text?.toString() ?: ""
+            val desc = node.contentDescription?.toString() ?: ""
+            if (text.isNotEmpty()) result.add(text)
+            if (desc.isNotEmpty()) result.add(desc)
+            for (i in 0 until node.childCount) {
+                result.addAll(getAllDescendantTexts(node.getChild(i)))
+            }
+            return result
+        }
+
+        fun collect(node: AccessibilityNodeInfo?) {
+            if (node == null) return
+            if (node.packageName == "com.example.simple_agent_android") return
+            val rect = Rect()
+            node.getBoundsInScreen(rect)
+            if ((node.isClickable || node.isFocusable || node.isLongClickable) && !rect.isEmpty) {
+                val obj = JSONObject()
+                var text = node.text?.toString() ?: ""
+                var contentDescription = node.contentDescription?.toString() ?: ""
+                if (text.isEmpty() && contentDescription.isEmpty()) {
+                    val fallback = getFirstNonEmptyTextOrDesc(node)
+                    text = fallback.first
+                    contentDescription = fallback.second
+                }
+                if (text.isNotEmpty()) obj.put("text", text)
+                if (contentDescription.isNotEmpty()) obj.put("contentDescription", contentDescription)
+                val className = node.className?.toString() ?: ""
+                if (className.isNotEmpty()) obj.put("className", className)
+                val resourceId = node.viewIdResourceName ?: ""
+                if (resourceId.isNotEmpty()) obj.put("resourceId", resourceId)
+                val packageName = node.packageName?.toString() ?: ""
+                if (packageName.isNotEmpty()) obj.put("packageName", packageName)
+
+                // Apply the same offset that the visual boxes use
+                val adjustedRect = Rect(rect)
+                adjustedRect.top += verticalOffset
+                adjustedRect.bottom += verticalOffset
+
+                obj.put("x", adjustedRect.left)
+                obj.put("y", adjustedRect.top)
+                obj.put("width", adjustedRect.width())
+                obj.put("height", adjustedRect.height())
+
+                // Calculate center of the offset-adjusted box - this is the exact center the LLM should press
+                val centerX = adjustedRect.left + adjustedRect.width() / 2
+                val centerY = adjustedRect.top + adjustedRect.height() / 2
+
+                obj.put("center_x", centerX)
+                obj.put("center_y", centerY)
+
+                val childrenTexts = getAllDescendantTexts(node)
+                if (childrenTexts.isNotEmpty()) obj.put("childrenText", JSONArray(childrenTexts))
+                elements.add(obj)
+            }
+            for (i in 0 until node.childCount) {
+                collect(node.getChild(i))
+            }
+        }
+        collect(root)
+        val arr = JSONArray(elements)
+        return arr.toString(2)
+    }
+}
